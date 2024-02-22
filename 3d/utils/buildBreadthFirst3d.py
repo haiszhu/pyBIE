@@ -48,7 +48,7 @@ def buildBreadthFirst3d(f, func):
       f = refineBox3d(f, id, func)
       f['height'] = np.append(f['height'], 1)
       f['coeffs'][id] = []
-      rint = np.sqrt(rint**2 - f['rint'][:,id]**2 + np.sum(f['rint'][-8:]**2, axis=1))
+      rint = np.sqrt(rint**2 - f['rint'][:,id]**2 + np.sum(f['rint'][:,-8:]**2, axis=1))
     id = id + 1
     
   return f
