@@ -43,10 +43,11 @@ def refineBox3d(f, id, func):
   cyy1 = cscly1 * yy0 + cdom1[2]
   czz1 = csclz1 * zz0 + cdom1[4]
   cvals1 = func(cxx1, cyy1, czz1)
+  cvals1 = cvals1.reshape(nalias,nalias,nalias,-1)
   ccoeffs1 = vals2coeffs3d(cvals1)
   f['coeffs'].append(ccoeffs1[0:f['n'],0:f['n'],0:f['n']])
-  f['rint'] = np.append(f['rint'], np.sqrt((csclx1*cscly1*csclz1)*np.sum(cvals1**2*ww0)))
-  f['vmax'] = np.append(f['vmax'], np.max(np.abs(cvals1)))
+  f['rint'] = np.hstack((f['rint'], np.sqrt((csclx1*cscly1*csclz1)*np.sum(cvals1**2*ww0[:,:,:,np.newaxis], axis=(0, 1, 2)))[:,np.newaxis]))
+  f['vmax'] = np.hstack((f['vmax'], np.max(np.abs(cvals1), axis=(0, 1, 2))[:,np.newaxis]))
   # f['coeffs'].append({})
   
 
@@ -65,10 +66,11 @@ def refineBox3d(f, id, func):
   cyy2 = cscly2 * yy0 + cdom2[2]
   czz2 = csclz2 * zz0 + cdom2[4]
   cvals2 = func(cxx2, cyy2, czz2)
+  cvals2 = cvals2.reshape(nalias,nalias,nalias,-1)
   ccoeffs2 = vals2coeffs3d(cvals2)
   f['coeffs'].append(ccoeffs2[0:f['n'],0:f['n'],0:f['n']])
-  f['rint'] = np.append(f['rint'], np.sqrt((csclx2*cscly2*csclz2)*np.sum(cvals2**2*ww0)))
-  f['vmax'] = np.append(f['vmax'], np.max(np.abs(cvals2)))
+  f['rint'] = np.hstack((f['rint'], np.sqrt((csclx2*cscly2*csclz2)*np.sum(cvals2**2*ww0[:,:,:,np.newaxis], axis=(0, 1, 2)))[:,np.newaxis]))
+  f['vmax'] = np.hstack((f['vmax'], np.max(np.abs(cvals2), axis=(0, 1, 2))[:,np.newaxis]))
   # f['coeffs'].append({})
 
   cid3 = len(f['id'])
@@ -86,10 +88,11 @@ def refineBox3d(f, id, func):
   cyy3 = cscly3 * yy0 + cdom3[2]
   czz3 = csclz3 * zz0 + cdom3[4]
   cvals3 = func(cxx3, cyy3, czz3)
+  cvals3 = cvals3.reshape(nalias,nalias,nalias,-1)
   ccoeffs3 = vals2coeffs3d(cvals3)
   f['coeffs'].append(ccoeffs3[0:f['n'],0:f['n'],0:f['n']])
-  f['rint'] = np.append(f['rint'], np.sqrt((csclx3*cscly3*csclz3)*np.sum(cvals3**2*ww0)))
-  f['vmax'] = np.append(f['vmax'], np.max(np.abs(cvals3)))
+  f['rint'] = np.hstack((f['rint'], np.sqrt((csclx3*cscly3*csclz3)*np.sum(cvals3**2*ww0[:,:,:,np.newaxis], axis=(0, 1, 2)))[:,np.newaxis]))
+  f['vmax'] = np.hstack((f['vmax'], np.max(np.abs(cvals3), axis=(0, 1, 2))[:,np.newaxis]))
   # f['coeffs'].append({})
 
   cid4 = len(f['id'])
@@ -107,10 +110,11 @@ def refineBox3d(f, id, func):
   cyy4 = cscly4 * yy0 + cdom4[2]
   czz4 = csclz4 * zz0 + cdom4[4]
   cvals4 = func(cxx4, cyy4, czz4)
+  cvals4 = cvals4.reshape(nalias,nalias,nalias,-1)
   ccoeffs4 = vals2coeffs3d(cvals4)
   f['coeffs'].append(ccoeffs4[0:f['n'],0:f['n'],0:f['n']])
-  f['rint'] = np.append(f['rint'], np.sqrt((csclx4*cscly4*csclz4)*np.sum(cvals4**2*ww0)))
-  f['vmax'] = np.append(f['vmax'], np.max(np.abs(cvals4)))
+  f['rint'] = np.hstack((f['rint'], np.sqrt((csclx4*cscly4*csclz4)*np.sum(cvals4**2*ww0[:,:,:,np.newaxis], axis=(0, 1, 2)))[:,np.newaxis]))
+  f['vmax'] = np.hstack((f['vmax'], np.max(np.abs(cvals4), axis=(0, 1, 2))[:,np.newaxis]))
   # f['coeffs'].append({})
 
   cid5 = len(f['id'])
@@ -128,10 +132,11 @@ def refineBox3d(f, id, func):
   cyy5 = cscly5 * yy0 + cdom5[2]
   czz5 = csclz5 * zz0 + cdom5[4]
   cvals5 = func(cxx5, cyy5, czz5)
+  cvals5 = cvals5.reshape(nalias,nalias,nalias,-1)
   ccoeffs5 = vals2coeffs3d(cvals5)
   f['coeffs'].append(ccoeffs5[0:f['n'],0:f['n'],0:f['n']])
-  f['rint'] = np.append(f['rint'], np.sqrt((csclx5*cscly5*csclz5)*np.sum(cvals5**2*ww0)))
-  f['vmax'] = np.append(f['vmax'], np.max(np.abs(cvals5)))
+  f['rint'] = np.hstack((f['rint'], np.sqrt((csclx5*cscly5*csclz5)*np.sum(cvals5**2*ww0[:,:,:,np.newaxis], axis=(0, 1, 2)))[:,np.newaxis]))
+  f['vmax'] = np.hstack((f['vmax'], np.max(np.abs(cvals5), axis=(0, 1, 2))[:,np.newaxis]))
   # f['coeffs'].append({})
 
   cid6 = len(f['id'])
@@ -149,10 +154,11 @@ def refineBox3d(f, id, func):
   cyy6 = cscly6 * yy0 + cdom6[2]
   czz6 = csclz6 * zz0 + cdom6[4]
   cvals6 = func(cxx6, cyy6, czz6)
+  cvals6 = cvals6.reshape(nalias,nalias,nalias,-1)
   ccoeffs6 = vals2coeffs3d(cvals6)
   f['coeffs'].append(ccoeffs6[0:f['n'],0:f['n'],0:f['n']])
-  f['rint'] = np.append(f['rint'], np.sqrt((csclx6*cscly6*csclz6)*np.sum(cvals6**2*ww0)))
-  f['vmax'] = np.append(f['vmax'], np.max(np.abs(cvals6)))
+  f['rint'] = np.hstack((f['rint'], np.sqrt((csclx6*cscly6*csclz6)*np.sum(cvals6**2*ww0[:,:,:,np.newaxis], axis=(0, 1, 2)))[:,np.newaxis]))
+  f['vmax'] = np.hstack((f['vmax'], np.max(np.abs(cvals6), axis=(0, 1, 2))[:,np.newaxis]))
   # f['coeffs'].append({})
 
   cid7 = len(f['id'])
@@ -170,10 +176,11 @@ def refineBox3d(f, id, func):
   cyy7 = cscly7 * yy0 + cdom7[2]
   czz7 = csclz7 * zz0 + cdom7[4]
   cvals7 = func(cxx7, cyy7, czz7)
+  cvals7 = cvals7.reshape(nalias,nalias,nalias,-1)
   ccoeffs7 = vals2coeffs3d(cvals7)
   f['coeffs'].append(ccoeffs7[0:f['n'],0:f['n'],0:f['n']])
-  f['rint'] = np.append(f['rint'], np.sqrt((csclx7*cscly7*csclz7)*np.sum(cvals7**2*ww0)))
-  f['vmax'] = np.append(f['vmax'], np.max(np.abs(cvals7)))
+  f['rint'] = np.hstack((f['rint'], np.sqrt((csclx7*cscly7*csclz7)*np.sum(cvals7**2*ww0[:,:,:,np.newaxis], axis=(0, 1, 2)))[:,np.newaxis]))
+  f['vmax'] = np.hstack((f['vmax'], np.max(np.abs(cvals7), axis=(0, 1, 2))[:,np.newaxis]))
   # f['coeffs'].append({})
 
   cid8 = len(f['id'])
@@ -191,10 +198,11 @@ def refineBox3d(f, id, func):
   cyy8 = cscly8 * yy0 + cdom8[2]
   czz8 = csclz8 * zz0 + cdom8[4]
   cvals8 = func(cxx8, cyy8, czz8)
+  cvals8 = cvals8.reshape(nalias,nalias,nalias,-1)
   ccoeffs8 = vals2coeffs3d(cvals8)
   f['coeffs'].append(ccoeffs8[0:f['n'],0:f['n'],0:f['n']])
-  f['rint'] = np.append(f['rint'], np.sqrt((csclx8*cscly8*csclz8)*np.sum(cvals8**2*ww0)))
-  f['vmax'] = np.append(f['vmax'], np.max(np.abs(cvals8)))
+  f['rint'] = np.hstack((f['rint'], np.sqrt((csclx8*cscly8*csclz8)*np.sum(cvals8**2*ww0[:,:,:,np.newaxis], axis=(0, 1, 2)))[:,np.newaxis]))
+  f['vmax'] = np.hstack((f['vmax'], np.max(np.abs(cvals8), axis=(0, 1, 2))[:,np.newaxis]))
   # f['coeffs'].append({})
 
   f['children'][:, id] = [cid1, cid2, cid3, cid4, cid5, cid6, cid7, cid8]
@@ -207,6 +215,15 @@ def test_refineBox3d():
   func = lambda x, y, z: np.exp(-(x**2 + y**2 + z**2) * 50) + \
                          np.exp(-((x - 1/2)**2 + (y - 1/3)**2 + (z - 3/5)**2) * 10) + \
                          np.exp(-((x + 1/2)**2 + (y + 1/3)**2 + (z + 3/5)**2) * 20)
+  # func = lambda x, y, z: [np.exp(-(x**2 + y**2 + z**2) * 5), \
+  #                         np.exp(-((x - 1/2)**2 + (y - 1/3)**2 + (z - 3/5)**2) * 1), \
+  #                         np.exp(-((x + 1/2)**2 + (y + 1/3)**2 + (z + 3/5)**2) * 2), \
+  #                         np.exp(-((x + 1/4)**2 + (y - 1/5)**2 + (z - 4/5)**2) * 2) ]
+  nd = 4
+  func = lambda x, y, z: np.array([ np.exp(-(x**2 + y**2 + z**2) * 5), \
+                                    np.exp(-((x - 1/2)**2 + (y - 1/3)**2 + (z - 3/5)**2) * 10), \
+                                    np.exp(-((x + 1/2)**2 + (y + 1/3)**2 + (z + 3/5)**2) * 20), \
+                                    np.exp(-((x + 1/4)**2 + (y - 1/5)**2 + (z - 4/5)**2) * 2)]).reshape(nd,-1).transpose()
   f = {
     'domain': np.array([[-1], [1], [-1], [1], [-1], [1]]), 
     'tol': 1.0e-12,
@@ -220,9 +237,11 @@ def test_refineBox3d():
     'col': np.array([0]),
     'row': np.array([0]),
     'n': 12,
-    'checkpts': np.zeros((3, 3)),
-    'rint': np.array([0]),
-    'vmax': np.array([0])
+    'checkpts': np.array([[0,    0,    0],
+                          [1/2, 1/3,  3/5],
+                          [-1/2,-1/3, -3/5]]),
+    'rint': np.array([[] for k in range(nd)]),
+    'vmax': np.array([[] for k in range(nd)])
   }
   f = refineBox3d(f, 0, func)
   # savemat('refineBox3d.mat', {'fdomain': f['domain'], 'flevel': f['level'], 'fchildren': f['children'], 'fid': f['id'], 'rint': f['rint'], 'vals': f['vals'], 'ww0': f['ww0']})
