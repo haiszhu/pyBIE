@@ -245,7 +245,7 @@ def test_refineBox3d():
   }
   f = refineBox3d(f, 0, func)
   # savemat('refineBox3d.mat', {'fdomain': f['domain'], 'flevel': f['level'], 'fchildren': f['children'], 'fid': f['id'], 'rint': f['rint'], 'vals': f['vals'], 'ww0': f['ww0']})
-  savemat('refineBox3d.mat', {'fdomain': f['domain'], 'flevel': f['level'], 'fchildren': f['children'], 'fid': f['id'], 'rint': f['rint'], 'vmax': f['vmax']})
+  savemat('refineBox3d.mat', {'fdomain': f['domain'], 'flevel': f['level'], 'fchildren': f['children'], 'fheight': f['height'], 'fid': f['id'], 'rint': f['rint'], 'vmax': f['vmax']})
   
 if __name__=='__main__':
   test_refineBox3d()
