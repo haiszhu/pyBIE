@@ -29,12 +29,11 @@ def isResolved3d(coeffs, dom, n, tol, vmax, f, checkpts, rint):
   h = sclx
   eta = 0
   
-  resolved = True
-  for k in range(nd):
-    erra = np.sqrt(  np.sum((coeffs[-2:,:,:,k])**2) \
-                  + np.sum((coeffs[0:-2,-2:,:,k])**2) \
-                  + np.sum((coeffs[0:-2,0:-2,-2:,k])**2) )/(n**3-(n-2)**3)
-    resolved = resolved & (erra < tol * np.sqrt(1/(sclx*scly*sclz))*rint[k])
+  # resolved = True
+  erra = np.sqrt(   np.sum((coeffs[-2:,:,:,:])**2, axis=(0, 1, 2)) \
+                  + np.sum((coeffs[0:-2,-2:,:,:])**2, axis=(0, 1, 2)) \
+                  + np.sum((coeffs[0:-2,0:-2,-2:,:])**2, axis=(0, 1, 2)) )/(n**3-(n-2)**3)
+  resolved = np.prod(erra < tol * np.sqrt(1/(sclx*scly*sclz))*rint)
   
   if checkpts.size > 0:
     xxx = 2 * ((checkpts[0,:] - dom[0])/sclx) - 1
