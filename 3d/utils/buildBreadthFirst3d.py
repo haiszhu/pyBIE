@@ -41,6 +41,7 @@ def buildBreadthFirst3d(f, func):
   rint = f['rint'][:,0]
   while id < len(f['id']):
     resolved, erra = isResolved3d(f['coeffs'][id], f['domain'][:, id], f['n'], f['tol'], f['vmax'][:,id], func, f['checkpts'], rint)
+    f['rint0'] = np.hstack((f['rint0'], rint[:,np.newaxis]))
     if resolved:
       f['height'][id] = 0
     else:
@@ -86,11 +87,12 @@ def test_buildBreadthFirst3d():
                           [1/2, 1/3,  3/5],
                           [-1/2,-1/3, -3/5]]),
     'rint': np.array([[] for k in range(nd)]),
-    'vmax': np.array([[] for k in range(nd)])
+    'vmax': np.array([[] for k in range(nd)]),
+    'rint0': np.array([[] for k in range(nd)])
   }
   
   f, rint = buildBreadthFirst3d(f, func)
-  savemat('buildBreadthFirst3d.mat', {'rint': rint, 'fdomain': f['domain'], 'flevel': f['level'], 'fchildren': f['children'], 'fheight': f['height'], 'fid': f['id'], 'frint': f['rint']})
+  savemat('buildBreadthFirst3d.mat', {'rint0': f['rint0'], 'rint': rint, 'fdomain': f['domain'], 'flevel': f['level'], 'fchildren': f['children'], 'fheight': f['height'], 'fid': f['id'], 'frint': f['rint']})
   
 
   # # install pyscf
