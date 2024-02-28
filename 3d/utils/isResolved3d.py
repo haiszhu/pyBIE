@@ -7,33 +7,44 @@ from scipy.io import savemat
 from utils.cheby import cheby
 from utils.vals2coeffs3d import vals2coeffs3d
 from utils.coeffs2checkvals3d import coeffs2checkvals3d
+from utils.coeffs2refvals3d import coeffs2refvals3d
 
-def isResolved3d(coeffs, dom, n, tol, vmax, f, checkpts, rint):
-  global xxx0, yyy0, zzz0, nstored
+def isResolved3d(coeffs, dom, n, tol, vmax, f, checkpts, ifcoeffs, rint):
+  global xxx0, yyy0, zzz0, www0, nstored
   
   nalias = n
-  nrefpts = 2*n
+  nrefpts = n
   _,_,_,nd = coeffs.shape
   
   if 'xxx0' not in globals() or n!=nstored:
     nstored = n
     xxx0, yyy0, zzz0 = np.meshgrid(np.linspace(0,1,nrefpts),np.linspace(0,1,nrefpts),np.linspace(0,1,nrefpts),indexing='ij')
+    wxxx0, wyyy0, wzzz0 = np.meshgrid(np.ones(nrefpts)/nstored,np.ones(nrefpts)/nstored,np.ones(nrefpts)/nstored,indexing='ij')
+    www0 = wxxx0*wyyy0*wzzz0
 
   sclx = dom[1] - dom[0]
   scly = dom[3] - dom[2]
   sclz = dom[5] - dom[4]
-  xxx = sclx * xxx0 + dom[0]
-  yyy = scly * yyy0 + dom[2]
-  zzz = sclz * zzz0 + dom[4]
   
   h = sclx
   eta = 0
   
-  # resolved = True
-  erra = np.sqrt(   np.sum((coeffs[-2:,:,:,:])**2, axis=(0, 1, 2)) \
-                  + np.sum((coeffs[0:-2,-2:,:,:])**2, axis=(0, 1, 2)) \
-                  + np.sum((coeffs[0:-2,0:-2,-2:,:])**2, axis=(0, 1, 2)) )/(n**3-(n-2)**3)
-  resolved = np.prod(erra < tol * np.sqrt(1/(sclx*scly*sclz))*rint)
+  if not ifcoeffs:
+    xxx = sclx * xxx0 + dom[0]
+    yyy = scly * yyy0 + dom[2]
+    zzz = sclz * zzz0 + dom[4]
+    F = f(xxx.flatten(),yyy.flatten(),zzz.flatten()).reshape(-1,nd).transpose()
+    G = coeffs2refvals3d(coeffs)
+    erra = np.sqrt(np.sum((G-np.transpose(F.reshape(nd,nrefpts,nrefpts,nrefpts),[1,2,3,0]))**2*www0[:,:,:,np.newaxis], axis=(0, 1, 2)))
+    resolved = np.prod(erra < tol * np.sqrt(1/(sclx*scly*sclz))*rint)
+  else:
+    erra = np.sqrt(   np.sum((coeffs[-1:,:,:,:])**2, axis=(0, 1, 2)) \
+                    + np.sum((coeffs[0:-1,-1:,:,:])**2, axis=(0, 1, 2)) \
+                    + np.sum((coeffs[0:-1,0:-1,-1:,:])**2, axis=(0, 1, 2)) )/np.sqrt(n**3-(n-1)**3)
+    # erra = np.sqrt(   np.sum((coeffs[-2:,:,:,:])**2, axis=(0, 1, 2)) \
+    #                 + np.sum((coeffs[0:-2,-2:,:,:])**2, axis=(0, 1, 2)) \
+    #                 + np.sum((coeffs[0:-2,0:-2,-2:,:])**2, axis=(0, 1, 2)) )/np.sqrt(n**3-(n-2)**3)
+    resolved = np.prod(erra < tol * np.sqrt(1/(sclx*scly*sclz))*rint)
   
   if checkpts.size > 0:
     xxx = 2 * ((checkpts[0,:] - dom[0])/sclx) - 1
@@ -80,13 +91,14 @@ def test_isResolved3d():
     'coeffs': [],
     'col': np.array([0]),
     'row': np.array([0]),
-    'n': 45,
+    'n': 53,
     # 'checkpts': np.array([]), 
     'checkpts': np.array([[0,    0,    0],
                           [1/2, 1/3,  3/5],
                           [-1/2,-1/3, -3/5]]),
     'rint': np.array([[] for k in range(nd)]),
-    'vmax': np.array([[] for k in range(nd)])
+    'vmax': np.array([[] for k in range(nd)]),
+    'ifcoeffs': False
   }
   nalias = f['n']
   x0, w0, D0 = cheby(nalias,0)
@@ -110,7 +122,7 @@ def test_isResolved3d():
   f['rint'] = np.hstack((f['rint'], rint[:,np.newaxis]))
   f['vmax'] = np.hstack((f['vmax'], np.amax(np.abs(vals), axis=(0, 1, 2))[:,np.newaxis]))
 
-  resolved, erra = isResolved3d(f['coeffs'][0], dom, f['n'], 1e-12, f['vmax'][:,0], func, f['checkpts'], rint)
+  resolved, erra = isResolved3d(f['coeffs'][0], dom, f['n'], 1e-12, f['vmax'][:,0], func, f['checkpts'], f['ifcoeffs'], rint)
   # resolved = 0
   # erra = 0
   savemat('isResolved.mat', {'resolved': resolved, 'coeffs': f['coeffs'][0], 'rint': f['rint'], 'vmax': f['vmax'], 'erra': erra, 'valsdotww0': vals**2*ww0[:,:,:,np.newaxis]})

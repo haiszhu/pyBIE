@@ -30,17 +30,31 @@ def buildBreadthFirst3d(f, func):
   zz = sclz * zz0 + dom[4]
   vals = func(xx, yy, zz)
   vals = vals.reshape(nalias,nalias,nalias,-1)
+  
+  _,_,_,nd = vals.shape
   coeffs = vals2coeffs3d(vals)
   rint = np.sqrt((sclx*scly*sclz)*np.sum(vals**2*ww0[:,:,:,np.newaxis], axis=(0, 1, 2)))
   
+  f['level']    = np.array([0])
+  f['height']   = np.array([0])
+  f['id']       = np.array([0])
+  f['parent']   = np.array([0])
+  f['children'] = np.zeros((8,1))
+  f['coeffs']   = []
+  f['col']      = np.array([0])
+  f['row']      = np.array([0])                      
+  f['rint']     = np.array([[] for k in range(nd)])
+  f['vmax']     = np.array([[] for k in range(nd)])
+  f['rint0']    = np.array([[] for k in range(nd)])
+  
   f['coeffs'].append(coeffs[0:f['n'],0:f['n'],0:f['n']])
-  f['rint'] = np.hstack((f['rint'], rint[:,np.newaxis]))
-  f['vmax'] = np.hstack((f['vmax'], np.amax(np.abs(vals), axis=(0, 1, 2))[:,np.newaxis]))
+  f['rint']     = np.hstack((f['rint'], rint[:,np.newaxis]))
+  f['vmax']     = np.hstack((f['vmax'], np.amax(np.abs(vals), axis=(0, 1, 2))[:,np.newaxis]))
 
   id = 0
   rint = f['rint'][:,0]
   while id < len(f['id']):
-    resolved, erra = isResolved3d(f['coeffs'][id], f['domain'][:, id], f['n'], f['tol'], f['vmax'][:,id], func, f['checkpts'], rint)
+    resolved, erra = isResolved3d(f['coeffs'][id], f['domain'][:, id], f['n'], f['tol'], f['vmax'][:,id], func, f['checkpts'], f['ifcoeffs'], rint)
     f['rint0'] = np.hstack((f['rint0'], rint[:,np.newaxis]))
     if resolved:
       f['height'][id] = 0
@@ -68,27 +82,21 @@ def test_buildBreadthFirst3d():
                                     np.exp(-((x - 1/2)**2 + (y - 1/3)**2 + (z - 3/5)**2) * 100), \
                                     np.exp(-((x + 1/2)**2 + (y + 1/3)**2 + (z + 3/5)**2) * 200), \
                                     np.exp(-((x + 1/4)**2 + (y - 1/5)**2 + (z - 4/5)**2) * 200)]).reshape(nd,-1).transpose()
+  ifcoeffs = True
+  
+  # parameters
   dom = np.array([-1, 1, -1, 1, -1, 1])
+  tol = 1.0e-12
+  n = 10
   f = {
-    'domain': np.array([[-1], [1], [-1], [1], [-1], [1]]), 
-    'tol': 1.0e-12,
+    'domain': dom.reshape(-1,1), 
+    'tol': tol,
     'nSteps': 15,
-    'level': np.array([0]),
-    'height': np.array([0]),
-    'id': np.array([0]), # 
-    'parent': np.array([0]),
-    'children': np.zeros((8,1)), 
-    'coeffs': [],
-    'col': np.array([0]),
-    'row': np.array([0]),
-    'n': 16,
-    # 'checkpts': np.array([]), 
+    'n': n,
     'checkpts': np.array([[0,    0,    0],
                           [1/2, 1/3,  3/5],
                           [-1/2,-1/3, -3/5]]),
-    'rint': np.array([[] for k in range(nd)]),
-    'vmax': np.array([[] for k in range(nd)]),
-    'rint0': np.array([[] for k in range(nd)])
+    'ifcoeffs': ifcoeffs
   }
   
   f, rint = buildBreadthFirst3d(f, func)
