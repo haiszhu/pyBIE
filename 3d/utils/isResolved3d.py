@@ -35,16 +35,22 @@ def isResolved3d(coeffs, dom, n, tol, vmax, f, checkpts, ifcoeffs, rint):
     zzz = sclz * zzz0 + dom[4]
     F = f(xxx.flatten(),yyy.flatten(),zzz.flatten()).reshape(-1,nd).transpose()
     G = coeffs2refvals3d(coeffs)
-    erra = np.sqrt(np.sum((G-np.transpose(F.reshape(nd,nrefpts,nrefpts,nrefpts),[1,2,3,0]))**2*www0[:,:,:,np.newaxis], axis=(0, 1, 2)))
-    resolved = np.prod(erra < tol * np.sqrt(1/(sclx*scly*sclz))*rint)
+    # erra = np.sqrt(np.sum((G-np.transpose(F.reshape(nd,nrefpts,nrefpts,nrefpts),[1,2,3,0]))**2*www0[:,:,:,np.newaxis], axis=(0, 1, 2)))
+    # resolved = np.prod(erra < tol * np.sqrt(1/(sclx*scly*sclz))*rint)
+    erra = np.sqrt(np.sum((G-np.transpose(F.reshape(nd,nrefpts,nrefpts,nrefpts),[1,2,3,0]))**2*www0[:,:,:,np.newaxis]))
+    resolved = (erra < tol * np.sqrt(1/(sclx*scly*sclz))*np.sqrt(np.sum(rint))) # l2 norm of nd func
   else:
-    erra = np.sqrt(   np.sum((coeffs[-1:,:,:,:])**2, axis=(0, 1, 2)) \
-                    + np.sum((coeffs[0:-1,-1:,:,:])**2, axis=(0, 1, 2)) \
-                    + np.sum((coeffs[0:-1,0:-1,-1:,:])**2, axis=(0, 1, 2)) )/np.sqrt(n**3-(n-1)**3)
-    # erra = np.sqrt(   np.sum((coeffs[-2:,:,:,:])**2, axis=(0, 1, 2)) \
-    #                 + np.sum((coeffs[0:-2,-2:,:,:])**2, axis=(0, 1, 2)) \
-    #                 + np.sum((coeffs[0:-2,0:-2,-2:,:])**2, axis=(0, 1, 2)) )/np.sqrt(n**3-(n-2)**3)
-    resolved = np.prod(erra < tol * np.sqrt(1/(sclx*scly*sclz))*rint)
+    # erra = np.sqrt(   np.sum((coeffs[-1:,:,:,:])**2, axis=(0, 1, 2)) \
+    #                 + np.sum((coeffs[0:-1,-1:,:,:])**2, axis=(0, 1, 2)) \
+    #                 + np.sum((coeffs[0:-1,0:-1,-1:,:])**2, axis=(0, 1, 2)) )/np.sqrt(n**3-(n-1)**3)
+    # # erra = np.sqrt(   np.sum((coeffs[-2:,:,:,:])**2, axis=(0, 1, 2)) \
+    # #                 + np.sum((coeffs[0:-2,-2:,:,:])**2, axis=(0, 1, 2)) \
+    # #                 + np.sum((coeffs[0:-2,0:-2,-2:,:])**2, axis=(0, 1, 2)) )/np.sqrt(n**3-(n-2)**3)
+    # resolved = np.prod(erra < tol * np.sqrt(1/(sclx*scly*sclz))*rint)
+    erra = np.sqrt(   np.sum((coeffs[-1:,:,:,:])**2) \
+                    + np.sum((coeffs[0:-1,-1:,:,:])**2) \
+                    + np.sum((coeffs[0:-1,0:-1,-1:,:])**2) )/np.sqrt(nd*(n**3-(n-1)**3))
+    resolved = (erra < tol * np.sqrt(1/(sclx*scly*sclz))*np.sqrt(np.sum(rint)))
   
   if checkpts.size > 0:
     xxx = 2 * ((checkpts[0,:] - dom[0])/sclx) - 1
@@ -91,7 +97,7 @@ def test_isResolved3d():
     'coeffs': [],
     'col': np.array([0]),
     'row': np.array([0]),
-    'n': 53,
+    'n': 50,
     # 'checkpts': np.array([]), 
     'checkpts': np.array([[0,    0,    0],
                           [1/2, 1/3,  3/5],
