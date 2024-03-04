@@ -35,22 +35,22 @@ def isResolved3d(coeffs, dom, n, tol, vmax, f, checkpts, ifcoeffs, rint):
     zzz = sclz * zzz0 + dom[4]
     F = f(xxx.flatten(),yyy.flatten(),zzz.flatten()).reshape(-1,nd).transpose()
     G = coeffs2refvals3d(coeffs)
-    # erra = np.sqrt(np.sum((G-np.transpose(F.reshape(nd,nrefpts,nrefpts,nrefpts),[1,2,3,0]))**2*www0[:,:,:,np.newaxis], axis=(0, 1, 2)))
-    # resolved = np.prod(erra < tol * np.sqrt(1/(sclx*scly*sclz))*rint)
-    erra = np.sqrt(np.sum((G-np.transpose(F.reshape(nd,nrefpts,nrefpts,nrefpts),[1,2,3,0]))**2*www0[:,:,:,np.newaxis]))
-    resolved = (erra < tol * np.sqrt(1/(sclx*scly*sclz))*np.sqrt(np.sum(rint))) # l2 norm of nd func
+    erra = np.sqrt(np.sum((G-np.transpose(F.reshape(nd,nrefpts,nrefpts,nrefpts),[1,2,3,0]))**2*www0[:,:,:,np.newaxis], axis=(0, 1, 2)))
+    resolved = np.prod(erra < tol * np.sqrt(1/(sclx*scly*sclz))*rint)
+    # erra = np.sqrt(np.sum((G-np.transpose(F.reshape(nd,nrefpts,nrefpts,nrefpts),[1,2,3,0]))**2*www0[:,:,:,np.newaxis]))
+    # resolved = (erra < tol * np.sqrt(1/(sclx*scly*sclz))*np.sqrt(np.sum(rint**2))) # l2 norm of nd func
   else:
-    # erra = np.sqrt(   np.sum((coeffs[-1:,:,:,:])**2, axis=(0, 1, 2)) \
-    #                 + np.sum((coeffs[0:-1,-1:,:,:])**2, axis=(0, 1, 2)) \
-    #                 + np.sum((coeffs[0:-1,0:-1,-1:,:])**2, axis=(0, 1, 2)) )/np.sqrt(n**3-(n-1)**3)
-    # # erra = np.sqrt(   np.sum((coeffs[-2:,:,:,:])**2, axis=(0, 1, 2)) \
-    # #                 + np.sum((coeffs[0:-2,-2:,:,:])**2, axis=(0, 1, 2)) \
-    # #                 + np.sum((coeffs[0:-2,0:-2,-2:,:])**2, axis=(0, 1, 2)) )/np.sqrt(n**3-(n-2)**3)
-    # resolved = np.prod(erra < tol * np.sqrt(1/(sclx*scly*sclz))*rint)
-    erra = np.sqrt(   np.sum((coeffs[-1:,:,:,:])**2) \
-                    + np.sum((coeffs[0:-1,-1:,:,:])**2) \
-                    + np.sum((coeffs[0:-1,0:-1,-1:,:])**2) )/np.sqrt(nd*(n**3-(n-1)**3))
-    resolved = (erra < tol * np.sqrt(1/(sclx*scly*sclz))*np.sqrt(np.sum(rint)))
+    erra = np.sqrt(   np.sum((coeffs[-1:,:,:,:])**2, axis=(0, 1, 2)) \
+                    + np.sum((coeffs[0:-1,-1:,:,:])**2, axis=(0, 1, 2)) \
+                    + np.sum((coeffs[0:-1,0:-1,-1:,:])**2, axis=(0, 1, 2)) )/np.sqrt(n**3-(n-1)**3)
+    # erra = np.sqrt(   np.sum((coeffs[-2:,:,:,:])**2, axis=(0, 1, 2)) \
+    #                 + np.sum((coeffs[0:-2,-2:,:,:])**2, axis=(0, 1, 2)) \
+    #                 + np.sum((coeffs[0:-2,0:-2,-2:,:])**2, axis=(0, 1, 2)) )/np.sqrt(n**3-(n-2)**3)
+    resolved = np.prod(erra < tol * np.sqrt(1/(sclx*scly*sclz))*rint)
+    # erra = np.sqrt(   np.sum((coeffs[-1:,:,:,:])**2) \
+    #                 + np.sum((coeffs[0:-1,-1:,:,:])**2) \
+    #                 + np.sum((coeffs[0:-1,0:-1,-1:,:])**2) )/np.sqrt(nd*(n**3-(n-1)**3))
+    # resolved = (erra < tol * np.sqrt(1/(sclx*scly*sclz))*np.sqrt(np.sum(rint**2)))
   
   if checkpts.size > 0:
     xxx = 2 * ((checkpts[0,:] - dom[0])/sclx) - 1
@@ -77,17 +77,17 @@ def test_isResolved3d():
   #                         np.exp(-((x + 1/2)**2 + (y + 1/3)**2 + (z + 3/5)**2) * 2), \
   #                         np.exp(-((x + 1/4)**2 + (y - 1/5)**2 + (z - 4/5)**2) * 2) ]
   nd = 4
-  func = lambda x, y, z: np.array([ np.exp(-(x**2 + y**2 + z**2) * 5), \
-                                    np.exp(-((x - 1/2)**2 + (y - 1/3)**2 + (z - 3/5)**2) * 10), \
-                                    np.exp(-((x + 1/2)**2 + (y + 1/3)**2 + (z + 3/5)**2) * 20), \
-                                    np.exp(-((x + 1/4)**2 + (y - 1/5)**2 + (z - 4/5)**2) * 2)]).reshape(nd,-1).transpose()
+  func = lambda x, y, z: np.array([ np.exp(-(x**2 + y**2 + z**2) * 50), \
+                                    np.exp(-((x - 1/2)**2 + (y - 1/3)**2 + (z - 3/5)**2) * 100), \
+                                    np.exp(-((x + 1/2)**2 + (y + 1/3)**2 + (z + 3/5)**2) * 200), \
+                                    np.exp(-((x + 1/4)**2 + (y - 1/5)**2 + (z - 4/5)**2) * 20)]).reshape(nd,-1).transpose()
   # nd = 1
   # func = lambda x, y, z: np.array([ np.exp(-(x**2 + y**2 + z**2) * 5)]).reshape(nd,-1).transpose()
   
   dom = np.array([-1, 1, -1, 1, -1, 1])
   f = {
     'domain': np.array([[-1], [1], [-1], [1], [-1], [1]]), 
-    'tol': 1.0e-12,
+    'tol': 1.0e-5,
     'nSteps': 15,
     'level': np.array([0]),
     'height': np.array([0]),
@@ -132,6 +132,7 @@ def test_isResolved3d():
   # resolved = 0
   # erra = 0
   savemat('isResolved.mat', {'resolved': resolved, 'coeffs': f['coeffs'][0], 'rint': f['rint'], 'vmax': f['vmax'], 'erra': erra, 'valsdotww0': vals**2*ww0[:,:,:,np.newaxis]})
+  
   
 if __name__ == '__main__':
   test_isResolved3d()
