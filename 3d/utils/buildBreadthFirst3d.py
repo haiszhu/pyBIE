@@ -56,7 +56,7 @@ def buildBreadthFirst3d(f, func):
   ifstorecoeffs = f['ifstorecoeffs']
   
   # while loop over level
-  resolved, erra = isResolved3d(f['coeffs'][0], f['domain'][:, 0], f['n'], f['tol'], f['vmax'][:,0], func, f['checkpts'], ifcoeffs, rint)
+  resolved, erra = isResolved3d(f['coeffs'][0], f['domain'][:, 0], f['n'], f['tol'], f['vmax'][:,0], func, f['checkpts'], f['ifcoeffs'], rint)
   f['rint0']     = np.hstack((f['rint0'], rint[:,np.newaxis]))
   if resolved:
     return
@@ -64,7 +64,7 @@ def buildBreadthFirst3d(f, func):
     refinecnt = 1
     idl_start = 0
     idl = [0]
-  if not ifstorecoeffs or not resolved: # save memory, once isResolved done
+  if not f['ifstorecoeffs']: # save memory, once isResolved done
     f['coeffs'][0] = []
   
   while refinecnt:
@@ -116,11 +116,11 @@ def buildBreadthFirst3d(f, func):
     idl0 = np.arange(idl_start+1, idl_start+8*len(idl)+1)  # current level id
     for k in range(8*len(idl)):
       id = idl_start + k + 1
-      resolved, erra = isResolved3d(f['coeffs'][id], f['domain'][:, id], f['n'], f['tol'], f['vmax'][:,id], func, f['checkpts'], ifcoeffs, rint)
+      resolved, erra = isResolved3d(f['coeffs'][id], f['domain'][:, id], f['n'], f['tol'], f['vmax'][:,id], func, f['checkpts'], f['ifcoeffs'], rint)
       f['rint0'][:,id] = rint
       if resolved:
         unresolvedl[k] = False
-      if not ifstorecoeffs or not resolved: # save memory, once isResolved done
+      if ~ifstorecoeffs: # save memory, once isResolved done
         f['coeffs'][id] = []
       f['coeffs'][id]
         
@@ -165,7 +165,7 @@ def test_buildBreadthFirst3d():
                                     np.exp(-((x + 1/2)**2 + (y + 1/3)**2 + (z + 3/5)**2) * 200), \
                                     np.exp(-((x + 1/4)**2 + (y - 1/5)**2 + (z - 4/5)**2) * 200)]).reshape(nd,-1).transpose()
   ifcoeffs = False
-  ifstorecoeffs = True
+  ifstorecoeffs = False
   
   # parameters
   dom = np.array([-1, 1, -1, 1, -1, 1])

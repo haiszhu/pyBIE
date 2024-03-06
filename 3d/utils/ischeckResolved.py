@@ -64,7 +64,8 @@ def ischeckResolved3d(f, func, nd):
   _, erra         = isResolved3d(f['checkcoeffs'][0], dom, f['n'], f['tol'], np.array([]), func, np.array([]), ifcoeffs, rint)
   f['rint0']      = np.hstack((f['rint0'], rint[:,np.newaxis]))
   f['rint']       = np.hstack((f['rint'], rint[:,np.newaxis]))
-  erra            = np.sqrt(sclx*scly*sclz)*erra/rint
+  with np.errstate(divide='ignore'):
+    erra          = np.sqrt(sclx*scly*sclz)*erra/rint
   f['checkerror'] = np.hstack((f['checkerror'], erra[:,np.newaxis]))
   if resolved: # 1 box...
     return
